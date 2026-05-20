@@ -1,0 +1,1 @@
+# Sidebar, AppShell — structural component
