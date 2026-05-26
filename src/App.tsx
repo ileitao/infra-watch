@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
+import AppShell from '@/layouts/AppShell';
 
 function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Button>Infra Watch</Button>
-    </div>
+    <AppShell>
+      <p>Hello Infra Watch</p>
+    </AppShell>
   );
 }
 
