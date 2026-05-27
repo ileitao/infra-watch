@@ -15,7 +15,7 @@ export default function Topbar() {
       <div className="flex justify-start px-4 py-4">
         {currentOrganization && <div>{currentOrganization.name}</div>}
       </div>
-      <div className="flex justify-end items-stretch px-4 py-4">
+      <div className="flex justify-end items-center px-4 py-4">
         {currentMembership && (
           <div className="px-4">
             <Badge>{currentMembership.role}</Badge>

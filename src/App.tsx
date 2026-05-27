@@ -1,9 +1,10 @@
 import AppShell from '@/layouts/AppShell';
+import OverviewPage from '@/features/dashboard/OverviewPage';
 
 function App() {
   return (
     <AppShell>
-      <p>Hello Infra Watch</p>
+      <OverviewPage />
     </AppShell>
   );
 }
