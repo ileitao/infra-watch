@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { Link, useRouterState } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -55,8 +56,7 @@ export default function Sidebar() {
       .join('')
       .toUpperCase();
 
-  // active link — in a real app this comes from the router
-  const activePath = '/';
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <aside
@@ -87,21 +87,19 @@ export default function Sidebar() {
       {/* Nav links */}
       <nav className="flex-1 px-2 py-3 space-y-0.5">
         {NAV_LINKS.map(({ label, icon: Icon, href }) => {
-          const isActive = activePath === href;
           return (
-            <a
-              key={href}
-              href={href}
+            <Link
+              to={href}
               className={cn(
                 'flex items-center gap-3 px-2 py-2 rounded-md text-sm transition-colors',
-                isActive
+                pathname === href
                   ? 'bg-accent text-accent-foreground font-medium'
                   : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
               )}
             >
               <Icon size={16} className="shrink-0" />
               {!sidebarCollapsed && <span>{label}</span>}
-            </a>
+            </Link>
           );
         })}
       </nav>
