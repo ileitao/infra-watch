@@ -56,7 +56,7 @@ export interface Alert {
   orgId: string;
   threshold: number;
   type: AlertType;
-  notifiedTo: ReadonlyArray<string>;
+  notifiedTo: string[];
   createdAt: string;
   updatedAt: string;
 }
