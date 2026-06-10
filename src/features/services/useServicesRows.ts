@@ -5,7 +5,7 @@ import type { ServiceRow } from './types';
 // Hardcoded period
 const CURRENT_PERIOD = '2025-04';
 
-export const useServiceRows = (
+export const useServicesRows = (
   orgId: string,
   // period as param, replaces CURRENT_PERIOD
 ): {

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LineChart, Line } from 'recharts';
-import { useServiceRows } from './useServicesRows';
+import { useServicesRows } from './useServicesRows';
 import { cn } from '@/lib/utils';
 
 const providerColor: Record<string, string> = {
@@ -21,7 +21,7 @@ const providerColor: Record<string, string> = {
 
 export default function ServicesPage() {
   const { currentOrgId } = useAppStore();
-  const { data: rows, isLoading } = useServiceRows(currentOrgId ?? '');
+  const { data: rows, isLoading } = useServicesRows(currentOrgId ?? '');
 
   if (isLoading) return <Skeleton className="h-8 w-24 mt-1" />;
 
