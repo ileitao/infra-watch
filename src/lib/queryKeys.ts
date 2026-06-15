@@ -3,4 +3,5 @@ export const queryKeys = {
   spendEntries: (orgId: string) => ['spendEntries', orgId],
   services: (orgId: string) => ['services', orgId],
   alerts: (orgId: string) => ['alerts', orgId],
+  memberships: (orgId: string) => ['memberships', orgId],
 };

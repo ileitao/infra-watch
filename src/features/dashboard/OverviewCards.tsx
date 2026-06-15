@@ -70,7 +70,7 @@ export default function OverviewCards() {
       />
       <StatCard
         label="Budget Limit"
-        value={`$${budget?.amount.toLocaleString() ?? '—'}`}
+        value={`$${(budget?.amount ?? 0).toLocaleString()}`}
         isLoading={isLoadingBudget}
       />
       <StatCard
