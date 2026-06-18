@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
+import BudgetPage from '@/features/budget/BudgetPage';
 
 export const Route = createFileRoute('/budgets')({
-  component: () => <div>Budgets</div>,
+  component: BudgetPage,
 });
