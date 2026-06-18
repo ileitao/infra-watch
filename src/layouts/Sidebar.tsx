@@ -4,9 +4,17 @@ import {
   Wallet,
   Bell,
   Users,
+  Check,
   ChevronLeft,
   ChevronRight,
+  ChevronsUpDown,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -37,6 +45,9 @@ export default function Sidebar() {
     .filter((m) => m.userId === currentUser?.id)
     .map((m) => seed.organizations.find((o) => o.id === m.orgId)!)
     .filter(Boolean);
+
+  const organizationName =
+    seed.organizations.find((o) => o.id === currentOrgId)?.name ?? '';
 
   const handleOrgSwitch = (orgId: string) => {
     const membership = seed.memberships.find(
@@ -113,29 +124,48 @@ export default function Sidebar() {
             Organization
           </p>
         )}
-        {userOrgs.map((org) => (
-          <button
-            key={org.id}
-            onClick={() => handleOrgSwitch(org.id)}
-            className={cn(
-              'w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm transition-colors',
-              org.id === currentOrgId
-                ? 'bg-accent text-accent-foreground font-medium'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-            )}
-          >
-            <Avatar className="h-5 w-5 shrink-0">
-              <AvatarFallback className="text-[10px]">
-                {initials(org.name)}
-              </AvatarFallback>
-            </Avatar>
-            {!sidebarCollapsed && (
-              <span className="truncate text-left">{org.name}</span>
-            )}
-          </button>
-        ))}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={cn(
+                'flex items-center gap-2 px-2 py-2 rounded-md w-full hover:bg-accent transition-colors',
+                sidebarCollapsed ? 'justify-center' : 'justify-between',
+              )}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Avatar className="h-5 w-5 shrink-0">
+                  <AvatarFallback className="text-[10px]">
+                    {initials(organizationName)}
+                  </AvatarFallback>
+                </Avatar>
+                {!sidebarCollapsed && (
+                  <span className="truncate text-sm">{organizationName}</span>
+                )}
+              </div>
+              {!sidebarCollapsed && (
+                <ChevronsUpDown
+                  size={14}
+                  className="shrink-0 text-muted-foreground"
+                />
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40" align="start">
+            {userOrgs.map((org) => (
+              <DropdownMenuItem
+                onClick={() => handleOrgSwitch(org.id)}
+                key={org.id}
+              >
+                <Check
+                  size={14}
+                  className={cn('mr-2', org.id !== currentOrgId && 'invisible')}
+                />
+                {org.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-
       <Separator />
 
       {/* Current user */}
