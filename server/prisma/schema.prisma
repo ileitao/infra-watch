@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id          String            @id @default(uuid())
+  name        String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  memberships OrgMembership[]
+  services    Service[]
+  budgets     Budget[]
+  alerts      Alert[]
+}
+
+model User {
+  id          String            @id @default(uuid())
+  name        String
+  email       String            @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  memberships OrgMembership[]
+}
+
+model OrgMembership {
+  id            String         @id @default(uuid())
+  orgId         String
+  userId        String
+  role          Role           @default(MEMBER)
+  joinedAt      DateTime       @default(now())
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([orgId, userId])
+}
+
+model Service {
+  id            String         @id @default(uuid())
+  name          String
+  provider      Provider
+  orgId         String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  spendEntries  SpendEntry[]
+}
+
+model SpendEntry {
+  id            String    @id @default(uuid())
+  amount        Float
+  date          DateTime
+  billingPeriod String
+  serviceId     String
+  service       Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+}
+
+model Budget {
+  id            String         @id @default(uuid())
+  amount        Float
+  period        String
+  orgId         String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  @@unique([orgId, period])
+}
+
+model Alert {
+  id            String         @id @default(uuid())
+  orgId         String
+  threshold     Int
+  type          AlertType
+  notifiedTo    String[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  organization  Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum Provider {
+  AWS
+  VERCEL
+  RENDER
+  // and more
+}
+
+enum AlertType {
+  INFO
+  WARNING
+  ALERT
+}
