@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import { prisma } from './db';
+import { overviewRoutes } from './routes/overview';
 import { servicesRoutes } from './routes/services';
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -8,6 +9,7 @@ const app = Fastify({
   logger: isDev ? { transport: { target: 'pino-pretty' } } : true,
 });
 
+app.register(overviewRoutes);
 app.register(servicesRoutes);
 
 app.get('/health', async () => {
