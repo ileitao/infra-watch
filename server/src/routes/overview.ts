@@ -21,7 +21,7 @@ export async function overviewRoutes(app: FastifyInstance) {
     Querystring: { period?: string };
     Reply: OverviewResponse;
   }>(
-    '/orgs/:orgId/overview',
+    '/overview',
     {
       schema: {
         querystring: {
