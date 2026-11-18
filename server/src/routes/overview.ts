@@ -1,7 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from '../db';
-import { enrichAlerts } from '../lib/alerts';
 import { round2 } from '../lib/round2';
+import { enrichAlerts } from '../lib/alerts';
+import { getSpendStatus } from '../lib/spendStatus';
 
 interface OverviewResponse {
   period: string | null;
@@ -36,33 +37,29 @@ export async function overviewRoutes(app: FastifyInstance) {
       const { orgId } = request.params;
       const { period } = request.query;
 
-      // Getting the serviceIds first so I can use it in monthly spend and effectivePeriod aggregate's
+      const {
+        period: effectivePeriod,
+        totalSpend,
+        budgetAmount,
+        usedPercent,
+      } = await getSpendStatus(orgId, period);
+
+      if (effectivePeriod === null) {
+        return {
+          period: null,
+          totalSpend, // already calc'ed in getSpendStatus
+          budgetAmount, // already calc'ed in getSpendStatus
+          budgetUsedPercent: usedPercent, // already calc'ed in getSpendStatus
+          activeAlerts: 0,
+          monthlySpend: [],
+        };
+      }
+
       const services = await prisma.service.findMany({
         where: { orgId },
         select: { id: true },
       });
       const serviceIds = services.map((s) => s.id);
-
-      let effectivePeriod = period;
-      if (!effectivePeriod) {
-        const latest = await prisma.spendEntry.aggregate({
-          _max: { billingPeriod: true },
-          where: { serviceId: { in: serviceIds } },
-        });
-        effectivePeriod = latest._max.billingPeriod ?? undefined;
-      }
-
-      // max billingPeriod not found
-      if (!effectivePeriod) {
-        return {
-          period: null,
-          totalSpend: 0,
-          budgetAmount: null,
-          budgetUsedPercent: null,
-          activeAlerts: 0,
-          monthlySpend: [],
-        };
-      }
 
       const monthlySpend = await prisma.spendEntry.groupBy({
         by: ['billingPeriod'],
@@ -70,34 +67,20 @@ export async function overviewRoutes(app: FastifyInstance) {
         _sum: { amount: true },
         orderBy: { billingPeriod: 'asc' },
       });
-
-      const totalSpend =
-        monthlySpend.find((m) => m.billingPeriod === effectivePeriod)?._sum
-          .amount ?? 0;
-
-      let budgetUsedPercent: number | null = null;
       let activeAlerts = 0;
 
-      const budget = await prisma.budget.findUnique({
-        where: { orgId_period: { orgId, period: effectivePeriod } },
-      });
-
-      if (budget && budget.amount > 0) {
-        const rawPercent = (totalSpend * 100) / budget.amount;
-
+      if (usedPercent !== null) {
         const alerts = await prisma.alert.findMany({ where: { orgId } });
-        activeAlerts = enrichAlerts(alerts, rawPercent).filter(
+        activeAlerts = enrichAlerts(alerts, usedPercent).filter(
           (a) => a.fired,
         ).length;
-
-        budgetUsedPercent = round2(rawPercent);
       }
 
       return {
-        period: effectivePeriod,
-        totalSpend: round2(totalSpend),
-        budgetAmount: budget?.amount ?? null,
-        budgetUsedPercent,
+        period: effectivePeriod, // already calc'ed in getSpendStatus
+        totalSpend: round2(totalSpend), // already calc'ed in getSpendStatus (now rounded)
+        budgetAmount, // already calc'ed in getSpendStatus
+        budgetUsedPercent: usedPercent === null ? null : round2(usedPercent), // already calc'ed in getSpendStatus (now rounded)
         activeAlerts,
         monthlySpend: monthlySpend.map((m) => ({
           period: m.billingPeriod,
