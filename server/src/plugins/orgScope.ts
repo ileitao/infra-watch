@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from '../db';
 import { alertsRoutes } from '../routes/alerts';
+import { membersRoutes } from '../routes/members';
 import { overviewRoutes } from '../routes/overview';
 import { servicesRoutes } from '../routes/services';
 
@@ -19,6 +20,7 @@ export async function orgScope(app: FastifyInstance) {
   });
 
   app.register(alertsRoutes);
+  app.register(membersRoutes);
   app.register(overviewRoutes);
   app.register(servicesRoutes);
 }
