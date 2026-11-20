@@ -3,6 +3,7 @@ import { prisma } from '../db';
 import { round2 } from '../lib/round2';
 import { enrichAlerts } from '../lib/alerts';
 import { getSpendStatus } from '../lib/spendStatus';
+import { periodQuerystringSchema } from '../lib/schemas';
 
 interface OverviewResponse {
   period: string | null;
@@ -25,12 +26,7 @@ export async function overviewRoutes(app: FastifyInstance) {
     '/overview',
     {
       schema: {
-        querystring: {
-          type: 'object',
-          properties: {
-            period: { type: 'string', pattern: '^\\d{4}-(0[1-9]|1[0-2])$' },
-          },
-        },
+        querystring: periodQuerystringSchema,
       },
     },
     async (request) => {

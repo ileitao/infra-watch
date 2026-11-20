@@ -1,7 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from '../db';
-import { servicesRoutes } from '../routes/services';
+import { alertsRoutes } from '../routes/alerts';
 import { overviewRoutes } from '../routes/overview';
+import { servicesRoutes } from '../routes/services';
 
 export async function orgScope(app: FastifyInstance) {
   app.addHook('preHandler', async (request, reply) => {
@@ -17,6 +18,7 @@ export async function orgScope(app: FastifyInstance) {
     }
   });
 
-  app.register(servicesRoutes);
+  app.register(alertsRoutes);
   app.register(overviewRoutes);
+  app.register(servicesRoutes);
 }
